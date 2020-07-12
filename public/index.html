@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trova gli zeri</title>
+  <meta name="Description" content="Author: Jacopo Gili,
+    progetto single-page di ricerca dicotomica basato sul teorema di esistenza degli Zeri,
+    progetto maturità 2020, linguaggi e librerie utilizzati: html, css, js, bootstrap, firebase hosting">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="index.css">
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="theme-color" content="#2F3BA2" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Weather PWA">
+  <link rel="apple-touch-icon" href="/images/icons/icon-152x152.png">
+</head>
+<body>
+  <div class="container-fluid py-3" id="background">
+  <div class="container col-lg-5 col-md-7 box rounded">
+
+    <div class="row justify-content-center" id="titolo">
+        <h4>Ricerca Dicotomica</h4>
+    </div>
+    <div class="row justify-content-center" id="espressione">
+      <div class="col align-self-center">
+        <p>Inserisci i coefficenti <strong>a</strong><sub>n</sub> ... <strong>a</strong><sub>0</sub> dell'equazione <strong>a<sub>n</sub>x<sup>n</sup> + a<sub>n-1</sub>x<sup>n-1</sup> + ... + a<sub>0</sub>x<sup>0</sup> = 0</strong></p>
+      </div>
+    </div>
+
+    <form>
+      <div class="row justify-content-center mt-1">
+        <div class="form-group justify-content-center row-cols-md-3" id="input_form">
+          <input class="rounded" id="term2" placeholder="a2"><!-- comment suppresses white space
+          --><input class="rounded" id="term1" placeholder="a1"><!-- comment suppresses white space
+          --><input class="rounded" id="term0" placeholder="a0">
+        </div>
+    </div>
+
+      <div class="form-group row justify-content-center mt-1" id="SliderEstremi">
+        <input type="number" id="dterm" placeholder="x1">
+        <input type="number" id="eterm" placeholder="x2">
+      </div>
+    </form>
+
+    <div class="row justify-content-center mt-3 no-gutters" id="MiddleButtonRow">
+        <div class="col-md-2"><button type="button" class="btn btn-light" onclick="Zeri()">Trova lo zero</button></div>
+        <div class="col-md-3"><button type="button" class="btn btn-light" onclick="MasMin()">Trova massimo e minimo</button></div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col"><p id="demo">Benvenuto nel programma di ricerca dicotomica</p></div>
+      <div class="w-100"></div>
+      <div class="col"><p id="details"></p></div>
+    </div>
+
+    <div class="row justify-content-center no-gutters" >
+        <div class="col-md-3 col-6"><button type="button" class="btn btn-success btn-block" onclick="CambioCoefficenti()">Cambio grado</button></div>
+        <div class="col-md-3 col-6"><button type="button" class="btn btn-info btn-block tall" tabindex="0" data-toggle="popover" data-trigger="focus" data-placement="bottom" title="Teorema di esistenza degli zeri" data-content="Se f è una funzione continua in un intervallo limitato e chiuso [a,b] e negli estremi di tale intervallo assume valori di segno opposto, allora esiste almeno un punto c interno all'intervallo in cui f si annulla.">Info Point</button></div>
+        <div class="col-md-3 col-6"><button type="button" class="btn btn-warning btn-block tall" onclick="Draw()">Crea grafico</button></div>
+        <div class="col-md-3 col-6"><button type="button" class="btn btn-danger btn-block tall" onclick="ACaso()">Valori casuali</button></div>
+    </div>
+
+    <div class="row">
+      <canvas id="canvas" width="800" height="800">CANVAS NOT SUPPORTED IN THIS BROWSER!</canvas>
+    </div>
+
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script>
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  })
+  $('.popover-dismiss').popover({
+    trigger: 'focus'
+  })
+</script>
+<script src="index.js"></script>
+<script> // CODELAB: Register service worker.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('Service worker registered.', reg);
+        });
+  });
+} </script>
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="/__/firebase/7.8.0/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<!-- Initialize Firebase -->
+<script src="/__/firebase/init.js"></script>
+</body>
+</html>
